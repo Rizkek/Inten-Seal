@@ -69,8 +69,8 @@ export default function HomeClient({ news }: { news: NewsItem[] }) {
             <div className="bg-white py-16 lg:py-20">
                 <div className="app-container">
                     <div className="flex flex-col gap-8 lg:flex-row lg:items-center">
-                        {/* Teks Kiri */}
-                        <div className="flex-1 space-y-8 animate-fade-in-up">
+                        {/* Teks Kiri - Inter Font */}
+                        <div className="flex-1 space-y-8 animate-fade-in-up font-inter">
                             <span className="font-semibold text-gray-500">Headline</span>
                             <h1 className="text-3xl font-bold leading-tight text-gray-900 md:text-4xl lg:text-5xl">
                                 {currentHero.title}
@@ -117,10 +117,10 @@ export default function HomeClient({ news }: { news: NewsItem[] }) {
                 </div>
             </div>
 
-            {/* Berita Populer */}
+            {/* Berita Populer - Nunito Sans untuk Judul */}
             <div className="app-container pt-16 pb-8 animate-fade-in-up">
                 <div className="border-l-4 border-news-blue pl-4">
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-bold text-gray-900 font-nunito">
                         Berita Terpopuler
                     </h2>
                 </div>
@@ -138,10 +138,10 @@ export default function HomeClient({ news }: { news: NewsItem[] }) {
                                 <img src={item.image.small} alt={item.title} className="h-full w-full object-cover" />
                             </div>
                             <div className="flex flex-col">
-                                <h3 className="text-sm font-bold text-gray-900 line-clamp-4 hover:text-news-blue">
+                                <h3 className="text-sm font-bold text-gray-900 line-clamp-4 hover:text-news-blue font-nunito">
                                     <Link href={`/read/${5 + idx}`}>{item.title}</Link>
                                 </h3>
-                                <span className="mt-10 text-xs text-news-blue font-semibold">
+                                <span className="mt-10 text-xs text-news-blue font-semibold font-inter">
                                     Nasional &bull; {formatDate(item.isoDate)}
                                 </span>
                             </div>
@@ -153,10 +153,10 @@ export default function HomeClient({ news }: { news: NewsItem[] }) {
             {/* Daftar Berita Utama */}
             <div className="bg-gray-50 py-16 lg:py-20">
                 <div className="app-container">
-                    {/* Header */}
+                    {/* Header - Nunito Sans untuk Judul */}
                     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in-up">
                         <div className="border-l-4 border-news-blue pl-4">
-                            <h2 className="text-2xl font-bold text-gray-900">Rekomendasi Untuk Anda</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 font-nunito">Rekomendasi Untuk Anda</h2>
                         </div>
 
                         <div className="relative">
@@ -199,22 +199,81 @@ export default function HomeClient({ news }: { news: NewsItem[] }) {
                                 ← Previous
                             </button>
 
-                            {Array.from({ length: Math.min(totalPages, 8) }, (_, i) => i + 1).map((pageNum) => (
-                                <button
-                                    key={pageNum}
-                                    onClick={() => setCurrentPage(pageNum)}
-                                    className={`w-9 h-9 rounded-md text-sm font-medium transition-colors ${currentPage === pageNum
-                                        ? 'bg-news-blue text-white shadow-md'
-                                        : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    {pageNum}
-                                </button>
-                            ))}
+                            {(() => {
+                                // Smart pagination logic - menampilkan 8 halaman dengan current page di tengah
+                                const maxVisiblePages = 8;
+                                let startPage = 1;
+                                let endPage = Math.min(totalPages, maxVisiblePages);
 
-                            {totalPages > 8 && (
-                                <span className="w-6 text-center text-gray-500">...</span>
-                            )}
+                                if (totalPages > maxVisiblePages) {
+                                    // Jika current page lebih dari tengah range, geser window
+                                    const halfWindow = Math.floor(maxVisiblePages / 2);
+
+                                    if (currentPage > halfWindow) {
+                                        startPage = currentPage - halfWindow;
+                                        endPage = currentPage + halfWindow - 1;
+
+                                        // Jika endPage melebihi total, geser window ke kiri
+                                        if (endPage > totalPages) {
+                                            endPage = totalPages;
+                                            startPage = totalPages - maxVisiblePages + 1;
+                                        }
+                                    }
+                                }
+
+                                const pages = [];
+                                for (let i = startPage; i <= endPage; i++) {
+                                    pages.push(i);
+                                }
+
+                                return (
+                                    <>
+                                        {/* Tampilkan halaman pertama + ellipsis jika perlu */}
+                                        {startPage > 1 && (
+                                            <>
+                                                <button
+                                                    onClick={() => setCurrentPage(1)}
+                                                    className="w-9 h-9 rounded-md text-sm font-medium transition-colors text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    1
+                                                </button>
+                                                {startPage > 2 && (
+                                                    <span className="w-6 text-center text-gray-500">...</span>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {/* Tampilkan halaman dalam range */}
+                                        {pages.map((pageNum) => (
+                                            <button
+                                                key={pageNum}
+                                                onClick={() => setCurrentPage(pageNum)}
+                                                className={`w-9 h-9 rounded-md text-sm font-medium transition-colors ${currentPage === pageNum
+                                                    ? 'bg-news-blue text-white shadow-md'
+                                                    : 'text-gray-700 hover:bg-gray-100'
+                                                    }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        ))}
+
+                                        {/* Tampilkan ellipsis + halaman terakhir jika perlu */}
+                                        {endPage < totalPages && (
+                                            <>
+                                                {endPage < totalPages - 1 && (
+                                                    <span className="w-6 text-center text-gray-500">...</span>
+                                                )}
+                                                <button
+                                                    onClick={() => setCurrentPage(totalPages)}
+                                                    className="w-9 h-9 rounded-md text-sm font-medium transition-colors text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    {totalPages}
+                                                </button>
+                                            </>
+                                        )}
+                                    </>
+                                );
+                            })()}
 
                             <button
                                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
@@ -233,8 +292,8 @@ export default function HomeClient({ news }: { news: NewsItem[] }) {
                 <div className={`relative overflow-hidden rounded-2xl transition-all duration-500 ease-in-out ${banners[bannerIndex].color} shadow-2xl`}>
                     <div className="px-6 py-6 sm:px-8 lg:px-12">
                         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
-                            {/* Konten Teks */}
-                            <div className="flex-1 text-center lg:text-left text-white w-full lg:max-w-xl min-h-[160px] flex flex-col justify-center">
+                            {/* Konten Teks - Montserrat Font */}
+                            <div className="flex-1 text-center lg:text-left text-white w-full lg:max-w-xl min-h-[160px] flex flex-col justify-center font-montserrat">
                                 <h2 className="mb-4 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight transition-opacity duration-300">
                                     {banners[bannerIndex].title}
                                 </h2>

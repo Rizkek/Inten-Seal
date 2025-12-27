@@ -3,25 +3,74 @@
 /* Tailwind v4 CSS Variables */
 @theme inline {
   /* Custom Colors */
-  --color-news-blue: #0056b3;
+  --color-news-blue: #0090FF;
   --color-news-teal: #00a8a8;
-  --color-news-navy: #1a1a2e;
+  --color-news-navy: #2C3C4D;
+
+  /* Font Families */
+  --font-family-poppins: var(--font-poppins);
+  --font-family-inter: var(--font-inter);
+  --font-family-nunito: var(--font-nunito-sans);
+  --font-family-montserrat: var(--font-montserrat);
 }
 
+/* Custom Font Utilities */
+.font-poppins {
+  font-family: var(--font-poppins), sans-serif;
+}
 
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-nunito {
+  font-family: var(--font-nunito-sans), sans-serif;
+}
+
+.font-montserrat {
+  font-family: var(--font-montserrat), sans-serif;
+}
 
 html {
-  overflow-x: hidden;
   scroll-behavior: smooth;
+  /* Fix untuk mencegah horizontal scroll tanpa break sticky */
+  max-width: 100vw;
+  overflow-x: clip;
+  /* Gunakan clip instead of hidden untuk tidak break sticky */
 }
 
 body {
-  overflow-x: hidden;
+  max-width: 100vw;
+  overflow-x: clip;
+  /* Gunakan clip instead of hidden */
   color: #1f2937;
   background-color: #ffffff;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Pastikan tidak ada margin default */
+  margin: 0;
+  padding: 0;
+  /* Pastikan full width */
+  width: 100%;
+}
+
+
+
+/* Custom Z-Index untuk Navbar */
+/* Memastikan navbar SELALU di depan dengan isolation dan z-index yang sangat tinggi */
+.z-navbar {
+  z-index: 10000 !important;
+  /* Gunakan contain untuk membuat layer terpisah */
+  contain: layout style paint;
+}
+
+/* Pastikan semua main content memiliki z-index lebih rendah dari navbar */
+main,
+section,
+article {
+  position: relative;
+  z-index: 1;
 }
 
 /* Smooth Scrolling */

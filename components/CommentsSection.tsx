@@ -135,18 +135,76 @@ export default function CommentsSection() {
                         ←
                     </button>
 
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                        <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${currentPage === pageNum
-                                ? 'bg-news-blue text-white border-news-blue'
-                                : 'border-gray-300 hover:bg-gray-50'
-                                }`}
-                        >
-                            {pageNum}
-                        </button>
-                    ))}
+                    {(() => {
+                        // Smart pagination logic - maksimal 8 halaman yang bergeser
+                        const maxVisiblePages = 8;
+                        let startPage = 1;
+                        let endPage = Math.min(totalPages, maxVisiblePages);
+
+                        if (totalPages > maxVisiblePages) {
+                            const halfWindow = Math.floor(maxVisiblePages / 2);
+
+                            if (currentPage > halfWindow) {
+                                startPage = currentPage - halfWindow;
+                                endPage = currentPage + halfWindow - 1;
+
+                                if (endPage > totalPages) {
+                                    endPage = totalPages;
+                                    startPage = totalPages - maxVisiblePages + 1;
+                                }
+                            }
+                        }
+
+                        const pages = [];
+                        for (let i = startPage; i <= endPage; i++) {
+                            pages.push(i);
+                        }
+
+                        return (
+                            <>
+                                {startPage > 1 && (
+                                    <>
+                                        <button
+                                            onClick={() => setCurrentPage(1)}
+                                            className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                                        >
+                                            1
+                                        </button>
+                                        {startPage > 2 && (
+                                            <span className="px-2 text-gray-500">...</span>
+                                        )}
+                                    </>
+                                )}
+
+                                {pages.map((pageNum) => (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                        className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${currentPage === pageNum
+                                                ? 'bg-news-blue text-white border-news-blue'
+                                                : 'border-gray-300 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                ))}
+
+                                {endPage < totalPages && (
+                                    <>
+                                        {endPage < totalPages - 1 && (
+                                            <span className="px-2 text-gray-500">...</span>
+                                        )}
+                                        <button
+                                            onClick={() => setCurrentPage(totalPages)}
+                                            className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                                        >
+                                            {totalPages}
+                                        </button>
+                                    </>
+                                )}
+                            </>
+                        );
+                    })()}
 
                     <button
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
